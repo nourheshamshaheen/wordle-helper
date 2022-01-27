@@ -70,6 +70,8 @@ int main()
     load_dictionary();
 
     string word;
+    bool flag;
+    int counting;
 
     while(choice != 0)
     {
@@ -80,6 +82,26 @@ int main()
         {
             srand(time(0));
             int random = rand()%counter;
+            flag = false;
+            counting = 0;
+            //to better guess more letters, random word should have no repeated letters as much as it can
+            //however only do this for 10% of word pool size to not have a slow running algorithm
+            while(!flag && counting < fiveLetterWords.size()/10)
+            {
+                int random = rand()%fiveLetterWords.size();
+                flag = true;
+                for(int i = 0; i < 5; i++)
+                {
+                    for(int j = 0; j < i; j++)
+                    {
+                        if(fiveLetterWords[random][i] == fiveLetterWords[random][j])
+                        {
+                            flag = false;
+                        }
+                    }
+                }
+                counting++;
+            }
             cout << "Here's your starter word!" << endl;
             word = fiveLetterWords[random];
         }
@@ -98,14 +120,31 @@ int main()
     int win = 0;
     while(fiveLetterWords.size() > 1 && win == 0)
     {
+        int arr[5];
         cout << "Guess done, enter green/yellow/gray for each letter: \n1-Green 2-Yellow 3-Gray" << endl;
         for(int i = 0; i < 5; i++)
         {
         cout << "Letter " << word[i] << endl;
         cin >> choice;
+        arr[i] = choice;
         if(choice == 3)
         {
-            deleteGrayElements(word[i]);
+            bool yellow = false; // to see if a letter is repeated so it doesn't delete all instances of the letter
+            for(int j = 0; j < 5; j++)
+            {
+                if(word[i] == word[j] && i != j && (arr[j] != 3 || arr[i] !=3))
+                {
+                    yellow = true;
+                }
+            }
+            if(yellow)
+            {
+                getYellowElements(word[i], i);
+            }
+            else
+            {
+                deleteGrayElements(word[i]);
+            }
         }
         else if(choice == 2)
         {
@@ -126,7 +165,27 @@ int main()
             int temp = 2;
             while(temp!= 0)
             {
+                flag = false;
+                counting = 0;
+                //to better guess more letters, random word should have no repeated letters as much as it can
+                //however only do this for 10% of word pool size to not have a slow running algorithm
                 int random = rand()%fiveLetterWords.size();
+                while(!flag && counting < fiveLetterWords.size()/10)
+                {
+                    int random = rand()%fiveLetterWords.size();
+                    flag = true;
+                    for(int i = 0; i < 5; i++)
+                    {
+                        for(int j = 0; j < i; j++)
+                        {
+                            if(fiveLetterWords[random][i] == fiveLetterWords[random][j])
+                            {
+                                flag = false;
+                            }
+                        }
+                    }
+                    counting++;
+                }
                 cout << fiveLetterWords[random] << endl;
                 cout << "Do you want another word?" <<endl;
                 cout <<"0 - I'm okay with this word. \n1 - I don't like this word. Another one please!" << endl;
